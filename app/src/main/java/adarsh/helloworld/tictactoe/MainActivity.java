@@ -3,12 +3,15 @@ package adarsh.helloworld.tictactoe;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -27,7 +30,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private int roundCount = 0;
 
-    private Button resetButton;
+    private Button resetButton, loginButton;
+
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +41,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         textViewPlayer1 = findViewById(R.id.text_view_p1);
         textViewPlayer2 = findViewById(R.id.text_view_p2);
+
+        loginButton = findViewById(R.id.btn_login);
+        mAuth = FirebaseAuth.getInstance();
+
+        if (mAuth.getCurrentUser() != null)
+            loginButton.setText("Sign Out");
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -163,5 +174,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         player2Points = savedInstanceState.getInt("player2Points");
         player1Turn = savedInstanceState.getBoolean("player1Turn");
         updatePointsTextViews();
+    }
+
+    public void login(View view) {
+        if (mAuth.getCurrentUser() == null)
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+        else
+            mAuth.signOut();
     }
 }
