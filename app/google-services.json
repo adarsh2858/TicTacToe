@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "470187113903",
+    "firebase_url": "https://fir-loginapp-ec596.firebaseio.com",
+    "project_id": "fir-loginapp-ec596",
+    "storage_bucket": "fir-loginapp-ec596.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:470187113903:android:c42b44b708d1d80016435a",
+        "android_client_info": {
+          "package_name": "adarsh.helloworld.tictactoe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "470187113903-ovfhhpk8d1l0isi8jqvkt7tjn8taljsh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDHRVYDo9VsIPZBKqlrfTKcMDBeBs2rYM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "470187113903-ovfhhpk8d1l0isi8jqvkt7tjn8taljsh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:470187113903:android:2ad9828e3c69335116435a",
+        "android_client_info": {
+          "package_name": "ash.krishna.firebaseloginapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "470187113903-ovfhhpk8d1l0isi8jqvkt7tjn8taljsh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDHRVYDo9VsIPZBKqlrfTKcMDBeBs2rYM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "470187113903-ovfhhpk8d1l0isi8jqvkt7tjn8taljsh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
