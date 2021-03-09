@@ -4,6 +4,7 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -16,9 +17,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"/>
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".MultiplayerActivity" />
+        <activity android:name=".MainActivity" android:parentActivityName=".LandingPage"/>
+        <activity android:name=".LoginActivity" android:parentActivityName=".MainActivity"/>
+        <activity android:name=".MultiplayerActivity" android:parentActivityName=".LandingPage" />
     </application>
 
 </manifest>
