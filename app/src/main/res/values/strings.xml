@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Tic Tac Toe</string>
+    <string name="register">Register</string>
     <string name="login">Login</string>
+    <string name="single_player">Single Player</string>
+    <string name="double_player">Double Player</string>
+    <string name="multiplayer">Multiplayer</string>
 </resources>
