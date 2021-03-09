@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAuth = FirebaseAuth.getInstance();
 
         if (mAuth.getCurrentUser() != null)
-            loginButton.setText("Sign Out");
+            loginButton.setText(R.string.sign_out);
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     && fields[0][i].equals(fields[1][i]))
                 return true;
         }
+
         if (!fields[0][0].equals("")
                 && fields[0][0].equals(fields[1][1])
                 && fields[0][0].equals(fields[2][2]))
@@ -113,7 +114,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        if(!((Button) v).getText().toString().equals(""))
+            return;
+
         roundCount++;
+
         if (player1Turn)
             ((Button) v).setText(player1);
         else
@@ -134,8 +139,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void updatePointsTextViews() {
-        textViewPlayer1.setText("Player 1: " + player1Points);
-        textViewPlayer2.setText("Player 2: " + player2Points);
+        textViewPlayer1.setText(getString(R.string.player_1_points, player1Points));
+        textViewPlayer2.setText(getString(R.string.player_2_points, player2Points));
     }
 
     public void resetBoard() {
@@ -182,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else{
             mAuth.signOut();
             Toast.makeText(MainActivity.this, "Signed Out Successfully", Toast.LENGTH_SHORT).show();
-            loginButton.setText("Login");
+            loginButton.setText(R.string.login);
         }
     }
 }
