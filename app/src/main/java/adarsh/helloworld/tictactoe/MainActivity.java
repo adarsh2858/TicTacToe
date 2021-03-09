@@ -179,7 +179,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void login(View view) {
         if (mAuth.getCurrentUser() == null)
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-        else
+        else{
             mAuth.signOut();
+            Toast.makeText(MainActivity.this, "Signed Out Successfully", Toast.LENGTH_SHORT).show();
+            loginButton.setText("Login");
+        }
     }
 }
