@@ -1,6 +1,7 @@
 package adarsh.helloworld.tictactoe;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.Log;
@@ -30,6 +31,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -236,7 +238,24 @@ public class LoginActivity extends AppCompatActivity {
                                         String fullName = data.child("fullName").getValue().toString();
                                         String phone = data.child("phone").getValue().toString();
                                         Toast.makeText(LoginActivity.this, "Welcome " + fullName, Toast.LENGTH_SHORT).show();
+
+                                        // Storing data into SharedPreferences
+                                        SharedPreferences  mPrefs = getSharedPreferences("MySharedPref", MODE_PRIVATE);
+
+                                        // Creating an Editor object to edit(write to the file)
+                                        //set variables of 'myObject', etc.
                                         User.setSingleInstance(email, fullName, phone);
+                                        SharedPreferences.Editor prefsEditor = mPrefs.edit();
+                                        Gson gson = new Gson();
+                                        String json = gson.toJson(User.getInstance());
+
+                                        // Storing the key and its value as the data fetched from edittext
+                                        prefsEditor.putString("User", json);
+
+                                        // Once the changes have been made,
+                                        // we need to commit to apply those changes made,
+                                        // otherwise, it will throw an error
+                                        prefsEditor.commit();
                                     }
                                 }
 

@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +19,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.gson.Gson;
 
 public class MultiplayerActivity extends AppCompatActivity {
 
@@ -35,10 +37,22 @@ public class MultiplayerActivity extends AppCompatActivity {
         userName = findViewById(R.id.user_name);
         inviteButton = findViewById(R.id.btn_invite);
         mAuth = FirebaseAuth.getInstance();
-        currentUser = User.getInstance();
 
-        if (mAuth.getCurrentUser() != null)
+        if (mAuth.getCurrentUser() != null) {
+            // Retrieving the value using its keys the file name
+            // must be same in both saving and retrieving the data
+            SharedPreferences mPrefs = getSharedPreferences("MySharedPref", MODE_PRIVATE);
+
+            // The value will be default as empty string because
+            // for the very first time when the app is opened, there is nothing to show
+            Gson gson = new Gson();
+            String json = mPrefs.getString("User", "");
+            User.setSingleInstance(gson.fromJson(json, User.class));
+            currentUser = User.getInstance();
+
+            // We can then use the data
             userName.setText(currentUser.getFullName());
+        }
 
         inviteButton.setOnClickListener(new View.OnClickListener() {
             @Override
