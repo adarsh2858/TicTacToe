@@ -5,26 +5,41 @@ public class User {
     private String password;
     private String fullName;
     private String phone;
+    private static User singleInstance = null;
 
-    public User() {
+    public static User getInstance() {
+        return singleInstance;
     }
 
-    public User(String email, String password) {
-        this.email = email;
-        this.password = password;
+    public static void setSingleInstance(String email, String fullName, String phone) {
+        if (singleInstance == null)
+            singleInstance = new User(email, fullName, phone);
     }
 
-    public User(String email, String password, String fullName) {
+    public static void setSingleInstance(User nullValue) {
+        singleInstance = nullValue;
+    }
+
+    public User(String email) {
         this.email = email;
-        this.password = password;
+    }
+
+    public User(String email, String fullName) {
+        this.email = email;
         this.fullName = fullName;
     }
 
-    public User(String email, String password, String fullName, String phone) {
+    public User(String email, String fullName, String phone) {
         this.email = email;
-        this.password = password;
         this.fullName = fullName;
         this.phone = phone;
+    }
+
+    public User(String email, String fullName, String phone, String password) {
+        this.email = email;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.password = password;
     }
 
     public String getEmail() {
