@@ -186,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
         else{
             mAuth.signOut();
+            User.setSingleInstance(null);
             Toast.makeText(MainActivity.this, "Signed Out Successfully", Toast.LENGTH_SHORT).show();
             loginButton.setText(R.string.login);
         }

@@ -232,8 +232,11 @@ public class LoginActivity extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     for (DataSnapshot data : dataSnapshot.getChildren()) {
+                                        String email = data.child("email").getValue().toString();
                                         String fullName = data.child("fullName").getValue().toString();
+                                        String phone = data.child("phone").getValue().toString();
                                         Toast.makeText(LoginActivity.this, "Welcome " + fullName, Toast.LENGTH_SHORT).show();
+                                        User.setSingleInstance(email, fullName, phone);
                                     }
                                 }
 

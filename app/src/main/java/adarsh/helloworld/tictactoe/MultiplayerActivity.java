@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -16,9 +17,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class MultiplayerActivity extends AppCompatActivity {
 
+    TextView userName;
     Button inviteButton;
+    private FirebaseAuth mAuth;
+    private User currentUser;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -26,7 +32,13 @@ public class MultiplayerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_multiplayer);
         createNotificationChannel();
 
+        userName = findViewById(R.id.user_name);
         inviteButton = findViewById(R.id.btn_invite);
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = User.getInstance();
+
+        if (mAuth.getCurrentUser() != null)
+            userName.setText(currentUser.getFullName());
 
         inviteButton.setOnClickListener(new View.OnClickListener() {
             @Override
