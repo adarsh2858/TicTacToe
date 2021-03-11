@@ -72,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
                 String fullName = mFullName.getText().toString();
                 String phoneNo = mPhone.getText().toString();
 
-                newUser = new User(email, password, fullName, phoneNo);
+                newUser = new User(email, fullName, phoneNo, password);
 
                 createAccount(email, password);
             }
@@ -152,11 +152,11 @@ public class LoginActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d("credential success", "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
+                            updateUI(user, null);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("CREDENTIAL FAILURE", "signInWithCredential:failure", task.getException());
-                            updateUI(null);
+                            updateUI(null, null);
                         }
 
                         // ...
@@ -173,7 +173,7 @@ public class LoginActivity extends AppCompatActivity {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w("GOOGLE SIGN IN", "signInResult:failed code=" + e.getStatusCode());
-            updateUI(null);
+            updateUI(null, null);
         }
     }
 
@@ -184,11 +184,13 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         if (currentUser != null)
-            updateUI(currentUser);
+            updateUI(currentUser, null);
     }
 
     public void createAccount(String email, String password) {
         Log.d(TAG, "Create account Method");
+        final String finalEmail = email;
+
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -196,7 +198,7 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign up success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
+                            updateUI(user, finalEmail);
                         } else {
                             // If sign up fails, display a message to the user.
                             Toast.makeText(LoginActivity.this, "Register Authentication failed.", Toast.LENGTH_SHORT).show();
@@ -229,42 +231,7 @@ public class LoginActivity extends AppCompatActivity {
 //                                    System.out.println("The read failed: " + databaseError.getCode());
 //                                }
 //                            });
-
-                            mDatabase.orderByChild("email").equalTo(finalEmail).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    for (DataSnapshot data : dataSnapshot.getChildren()) {
-                                        String email = data.child("email").getValue().toString();
-                                        String fullName = data.child("fullName").getValue().toString();
-                                        String phone = data.child("phone").getValue().toString();
-                                        Toast.makeText(LoginActivity.this, "Welcome " + fullName, Toast.LENGTH_SHORT).show();
-
-                                        // Storing data into SharedPreferences
-                                        SharedPreferences  mPrefs = getSharedPreferences("MySharedPref", MODE_PRIVATE);
-
-                                        // Creating an Editor object to edit(write to the file)
-                                        //set variables of 'myObject', etc.
-                                        User.setSingleInstance(email, fullName, phone);
-                                        SharedPreferences.Editor prefsEditor = mPrefs.edit();
-                                        Gson gson = new Gson();
-                                        String json = gson.toJson(User.getInstance());
-
-                                        // Storing the key and its value as the data fetched from edittext
-                                        prefsEditor.putString("User", json);
-
-                                        // Once the changes have been made,
-                                        // we need to commit to apply those changes made,
-                                        // otherwise, it will throw an error
-                                        prefsEditor.commit();
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                    System.out.println("The read failed: " + databaseError.getCode());
-                                }
-                            });
-//                            updateUI(user);
+                            updateUI(user, finalEmail);
                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
 
                         } else {
@@ -275,11 +242,46 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    public void updateUI(FirebaseUser user) {
+    public void updateUI(FirebaseUser user, String finalEmail) {
         Log.d(TAG, "Update UI Method");
 
         String keyId = mDatabase.push().getKey();
         mDatabase.child(keyId).setValue(newUser);
+
+        mDatabase.orderByChild("email").equalTo(finalEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    String email = data.child("email").getValue().toString();
+                    String fullName = data.child("fullName").getValue().toString();
+                    String phone = data.child("phone").getValue().toString();
+                    Toast.makeText(LoginActivity.this, "Welcome " + fullName, Toast.LENGTH_SHORT).show();
+
+                    // Storing data into SharedPreferences
+                    SharedPreferences  mPrefs = getSharedPreferences("MySharedPref", MODE_PRIVATE);
+
+                    // Creating an Editor object to edit(write to the file)
+                    //set variables of 'myObject', etc.
+                    User.setSingleInstance(email, fullName, phone);
+                    SharedPreferences.Editor prefsEditor = mPrefs.edit();
+                    Gson gson = new Gson();
+                    String json = gson.toJson(User.getInstance());
+
+                    // Storing the key and its value as the data fetched from edittext
+                    prefsEditor.putString("User", json);
+
+                    // Once the changes have been made,
+                    // we need to commit to apply those changes made,
+                    // otherwise, it will throw an error
+                    prefsEditor.commit();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
 
         startActivity(new Intent(getApplicationContext(), MainActivity.class));
 
