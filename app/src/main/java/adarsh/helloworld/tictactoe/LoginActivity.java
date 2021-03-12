@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,6 +22,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -31,7 +35,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -45,6 +54,9 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mFullName, mEmail, mPassword, mPhone, mLoginEmail, mLoginPassword;
     private Button mRegisterButton, mLoginButton;
     private User newUser;
+
+    // Access a Cloud Firestore instance from your Activity
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,9 +84,22 @@ public class LoginActivity extends AppCompatActivity {
                 String fullName = mFullName.getText().toString();
                 String phoneNo = mPhone.getText().toString();
 
+                if (TextUtils.isEmpty(fullName)) {
+                    mFullName.setError("Full Name is required.");
+                }
+                else if(TextUtils.isEmpty(email)) {
+                    mEmail.setError("Email is required.");
+                }
+                else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    mEmail.setError("Enter valid email address.");
+                }
+                else if(TextUtils.isEmpty(password)) {
+                    mPassword.setError("Password is required.");
+                }
+                else {
                 newUser = new User(email, fullName, phoneNo, password);
-
-                createAccount(email, password);
+                createAccount(email, fullName, phoneNo, password);
+                }
             }
         });
 
@@ -84,7 +109,18 @@ public class LoginActivity extends AppCompatActivity {
                 String email = mLoginEmail.getText().toString();
                 String password = mLoginPassword.getText().toString();
 
-                signIn(email, password);
+                if(TextUtils.isEmpty(email)) {
+                    mLoginEmail.setError("Email is required.");
+                }
+                else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    mLoginEmail.setError("Enter valid email address.");
+                }
+                else if(TextUtils.isEmpty(password)) {
+                    mLoginPassword.setError("Password is required.");
+                }
+                else {
+                    signIn(email, password);
+                }
             }
         });
 
@@ -187,9 +223,8 @@ public class LoginActivity extends AppCompatActivity {
             updateUI(currentUser, null);
     }
 
-    public void createAccount(String email, String password) {
+    public void createAccount(final String email, final String fullName, final String phoneNumber, final String password) {
         Log.d(TAG, "Create account Method");
-        final String finalEmail = email;
 
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -198,7 +233,31 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign up success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user, finalEmail);
+
+                            // Create a new user with a first, middle, and last name
+                            Map<String, Object> newUser = new HashMap<>();
+                            newUser.put("email", email);
+                            newUser.put("password", password);
+                            newUser.put("fullName", fullName);
+                            newUser.put("phoneNumber", phoneNumber);
+
+                            // Add a new document with a generated ID
+                            db.collection("users")
+                                    .add(newUser)
+                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        @Override
+                                        public void onSuccess(DocumentReference documentReference) {
+                                            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w(TAG, "Error adding document", e);
+                                        }
+                                    });
+
+                            updateUI(user, email);
                         } else {
                             // If sign up fails, display a message to the user.
                             Toast.makeText(LoginActivity.this, "Register Authentication failed.", Toast.LENGTH_SHORT).show();
@@ -250,7 +309,7 @@ public class LoginActivity extends AppCompatActivity {
 
         mDatabase.orderByChild("email").equalTo(finalEmail).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                     String email = data.child("email").getValue().toString();
                     String fullName = data.child("fullName").getValue().toString();
@@ -258,7 +317,7 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Welcome " + fullName, Toast.LENGTH_SHORT).show();
 
                     // Storing data into SharedPreferences
-                    SharedPreferences  mPrefs = getSharedPreferences("MySharedPref", MODE_PRIVATE);
+                    SharedPreferences mPrefs = getSharedPreferences("MySharedPref", MODE_PRIVATE);
 
                     // Creating an Editor object to edit(write to the file)
                     //set variables of 'myObject', etc.
@@ -273,12 +332,12 @@ public class LoginActivity extends AppCompatActivity {
                     // Once the changes have been made,
                     // we need to commit to apply those changes made,
                     // otherwise, it will throw an error
-                    prefsEditor.commit();
+                    prefsEditor.apply();
                 }
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
