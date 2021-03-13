@@ -110,6 +110,7 @@ public class MultiplayerActivity extends AppCompatActivity {
                     }
                 }
             });
+            onShareClicked();
         }
 
         inviteButton.setOnClickListener(new View.OnClickListener() {
@@ -163,5 +164,37 @@ public class MultiplayerActivity extends AppCompatActivity {
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
+    }
+
+
+    public static Uri generateContentLink() {
+        DynamicLink dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                .setLink(Uri.parse("https://play.google.com/store"))
+                .setDomainUriPrefix("https://adarshenterprises.page.link")
+                // Open links with this app on Android
+                .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().setMinimumVersion(1).build())
+                // Open links with com.example.ios on iOS
+                .setIosParameters(new DynamicLink.IosParameters.Builder("com.example.ios").build())
+                .setSocialMetaTagParameters(new DynamicLink.SocialMetaTagParameters.Builder()
+                        .setTitle("Example of a Dynamic Link")
+                        .setDescription("This link works whether the app is installed or not!")
+                        .setImageUrl(Uri.parse("https://res.cloudinary.com/dj2xpmtn5/image/upload/v1614188994/gt1eyo6l4qfmk3twzipq.jpg"))
+                        .build())
+                .buildDynamicLink();
+
+        final Uri dynamicLinkUri = dynamicLink.getUri();
+
+        return dynamicLinkUri;
+    }
+
+    private void onShareClicked() {
+//        Uri link = MultiplayerActivity.generateContentLink();
+        Uri link = Uri.parse("https://adarshenterprises.page.link/tictactoe");
+
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, link.toString());
+
+        startActivity(Intent.createChooser(intent, "Share Link"));
     }
 }
