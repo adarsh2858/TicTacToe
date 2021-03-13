@@ -82,8 +82,7 @@ public class MultiplayerActivity extends AppCompatActivity {
                                     Log.d(TAG, document.getId() + " => " + document.getData());
                                     Map<String, Object> documentData = document.getData();
                                     // looping over keys
-                                    for (String name : documentData.keySet())
-                                    {
+                                    for (String name : documentData.keySet()) {
                                         // search  for value
                                         Object url = documentData.get(name);
                                         System.out.println("Key = " + name + ", Value = " + url);
@@ -94,6 +93,23 @@ public class MultiplayerActivity extends AppCompatActivity {
                             }
                         }
                     });
+
+            DocumentReference docRef = db.collection("users").document(currentUser.getEmail());
+            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        } else {
+                            Log.d(TAG, "No such document");
+                        }
+                    } else {
+                        Log.d(TAG, "get failed with ", task.getException());
+                    }
+                }
+            });
         }
 
         inviteButton.setOnClickListener(new View.OnClickListener() {

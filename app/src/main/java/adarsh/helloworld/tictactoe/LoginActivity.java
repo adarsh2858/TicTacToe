@@ -86,19 +86,15 @@ public class LoginActivity extends AppCompatActivity {
 
                 if (TextUtils.isEmpty(fullName)) {
                     mFullName.setError("Full Name is required.");
-                }
-                else if(TextUtils.isEmpty(email)) {
+                } else if (TextUtils.isEmpty(email)) {
                     mEmail.setError("Email is required.");
-                }
-                else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     mEmail.setError("Enter valid email address.");
-                }
-                else if(TextUtils.isEmpty(password)) {
+                } else if (TextUtils.isEmpty(password)) {
                     mPassword.setError("Password is required.");
-                }
-                else {
-                newUser = new User(email, fullName, phoneNo, password);
-                createAccount(email, fullName, phoneNo, password);
+                } else {
+                    newUser = new User(email, fullName, phoneNo, password);
+                    createAccount(email, fullName, phoneNo, password);
                 }
             }
         });
@@ -109,16 +105,13 @@ public class LoginActivity extends AppCompatActivity {
                 String email = mLoginEmail.getText().toString();
                 String password = mLoginPassword.getText().toString();
 
-                if(TextUtils.isEmpty(email)) {
+                if (TextUtils.isEmpty(email)) {
                     mLoginEmail.setError("Email is required.");
-                }
-                else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     mLoginEmail.setError("Enter valid email address.");
-                }
-                else if(TextUtils.isEmpty(password)) {
+                } else if (TextUtils.isEmpty(password)) {
                     mLoginPassword.setError("Password is required.");
-                }
-                else {
+                } else {
                     signIn(email, password);
                 }
             }
@@ -256,6 +249,11 @@ public class LoginActivity extends AppCompatActivity {
                                             Log.w(TAG, "Error adding document", e);
                                         }
                                     });
+
+                            // Add a new document with the email as the ID
+                            db.collection("users")
+                                    .document(email)
+                                    .set(newUser);
 
                             updateUI(user, email);
                         } else {
