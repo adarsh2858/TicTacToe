@@ -72,13 +72,22 @@ public class MultiplayerActivity extends AppCompatActivity {
             // We can then use the data
             userName.setText(currentUser.getFullName());
 
+
             db.collection("users")
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
                             if (task.isSuccessful()) {
-                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                QuerySnapshot taskResults = null;
+                                try {
+                                    taskResults = task.getResult();
+                                } catch (NullPointerException e) {
+                                    System.out.println("Null Pointer Exception occurred in docRef listener.");
+                                    e.printStackTrace();
+                                }
+
+                                for (QueryDocumentSnapshot document : taskResults) {
                                     Log.d(TAG, document.getId() + " => " + document.getData());
                                     Map<String, Object> documentData = document.getData();
                                     // looping over keys
@@ -88,6 +97,7 @@ public class MultiplayerActivity extends AppCompatActivity {
                                         System.out.println("Key = " + name + ", Value = " + url);
                                     }
                                 }
+
                             } else {
                                 Log.w(TAG, "Error getting documents.", task.getException());
                             }
@@ -95,22 +105,26 @@ public class MultiplayerActivity extends AppCompatActivity {
                     });
 
             DocumentReference docRef = db.collection("users").document(currentUser.getEmail());
-            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+            try {
+                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                            } else {
+                                Log.d(TAG, "No such document");
+                            }
                         } else {
-                            Log.d(TAG, "No such document");
+                            Log.d(TAG, "get failed with ", task.getException());
                         }
-                    } else {
-                        Log.d(TAG, "get failed with ", task.getException());
                     }
-                }
-            });
-            onShareClicked();
+                });
+            } catch (NullPointerException e) {
+                System.out.println("Null Pointer Exception occurred in docRef listener.");
+                e.printStackTrace();
+            }
         }
 
         inviteButton.setOnClickListener(new View.OnClickListener() {
@@ -146,6 +160,7 @@ public class MultiplayerActivity extends AppCompatActivity {
                 // notificationId is a unique int for each notification that you must define
                 int notificationId = 1;
                 notificationManager.notify(notificationId, builder.build());
+                onShareClicked();
             }
         });
     }
@@ -182,9 +197,7 @@ public class MultiplayerActivity extends AppCompatActivity {
                         .build())
                 .buildDynamicLink();
 
-        final Uri dynamicLinkUri = dynamicLink.getUri();
-
-        return dynamicLinkUri;
+        return dynamicLink.getUri();
     }
 
     private void onShareClicked() {
