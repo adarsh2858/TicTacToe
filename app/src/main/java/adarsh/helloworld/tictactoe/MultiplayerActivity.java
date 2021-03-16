@@ -10,8 +10,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,19 +38,63 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class MultiplayerActivity extends AppCompatActivity {
 
     private static final String TAG = "Multiplayer Activity";
-
-    private FirebaseAuth mAuth;
-    private User currentUser;
+    final ArrayList<User> usersList = new ArrayList<User>();
     TextView userName;
     Button inviteButton;
-
     // Access a Cloud Firestore instance from your Activity
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseAuth mAuth;
+    private User currentUser;
+
+    public static Uri generateContentLink() {
+        DynamicLink dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
+                .setLink(Uri.parse("https://play.google.com/store"))
+                .setDomainUriPrefix("https://adarshenterprises.page.link")
+                // Open links with this app on Android
+                .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().setMinimumVersion(1).build())
+                // Open links with com.example.ios on iOS
+                .setIosParameters(new DynamicLink.IosParameters.Builder("com.example.ios").build())
+                .setSocialMetaTagParameters(new DynamicLink.SocialMetaTagParameters.Builder()
+                        .setTitle("Example of a Dynamic Link")
+                        .setDescription("This link works whether the app is installed or not!")
+                        .setImageUrl(Uri.parse("https://res.cloudinary.com/dj2xpmtn5/image/upload/v1614188994/gt1eyo6l4qfmk3twzipq.jpg"))
+                        .build())
+                .buildDynamicLink();
+
+        return dynamicLink.getUri();
+    }
+
+    private void showPopup() {
+        //                for (int i = 0; i < usersList.size(); i++)
+        System.out.println(usersList);
+        // inflate the layout of the popup window
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.popup_window, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, true);
+
+        // show the popup window
+        // which view you pass in it doesn't matter, it is only used for the window token
+        popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
+
+        // dismiss the popup window when touched
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,38 +120,6 @@ public class MultiplayerActivity extends AppCompatActivity {
 
             // We can then use the data
             userName.setText(currentUser.getFullName());
-
-
-            db.collection("users")
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                QuerySnapshot taskResults = null;
-                                try {
-                                    taskResults = task.getResult();
-                                } catch (NullPointerException e) {
-                                    System.out.println("Null Pointer Exception occurred in docRef listener.");
-                                    e.printStackTrace();
-                                }
-
-                                for (QueryDocumentSnapshot document : taskResults) {
-                                    Log.d(TAG, document.getId() + " => " + document.getData());
-                                    Map<String, Object> documentData = document.getData();
-                                    // looping over keys
-                                    for (String name : documentData.keySet()) {
-                                        // search  for value
-                                        Object url = documentData.get(name);
-                                        System.out.println("Key = " + name + ", Value = " + url);
-                                    }
-                                }
-
-                            } else {
-                                Log.w(TAG, "Error getting documents.", task.getException());
-                            }
-                        }
-                    });
 
             DocumentReference docRef = db.collection("users").document(currentUser.getEmail());
             try {
@@ -160,7 +177,50 @@ public class MultiplayerActivity extends AppCompatActivity {
                 // notificationId is a unique int for each notification that you must define
                 int notificationId = 1;
                 notificationManager.notify(notificationId, builder.build());
-                onShareClicked();
+
+                db.collection("users")
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    QuerySnapshot taskResults = null;
+                                    try {
+                                        taskResults = task.getResult();
+                                    } catch (NullPointerException e) {
+                                        System.out.println("Null Pointer Exception occurred in docRef listener.");
+                                        e.printStackTrace();
+                                    }
+
+                                    for (QueryDocumentSnapshot document : taskResults) {
+//                                        Log.d(TAG, document.getId() + " => " + document.getData());
+                                        Map<String, Object> documentData = document.getData();
+                                        // looping over keys
+//                                        Log.d(TAG, " DOCUMENT DATA - " + documentData);
+
+                                        User newUser = new User();
+                                        for (String name : documentData.keySet()) {
+                                            // search  for value
+                                            Object value = documentData.get(name);
+                                            if (name.equals("email")) {
+                                                System.out.println("Key = " + name + ", Value = " + value);
+                                                newUser.setEmail(value.toString());
+                                            } else if (name.equals("fullName"))
+                                                newUser.setFullName(value.toString());
+                                        }
+
+                                        usersList.add(newUser);
+//                                        System.out.println(usersList);
+                                    }
+                                    showPopup();
+
+                                } else {
+                                    Log.w(TAG, "Error getting documents.", task.getException());
+                                }
+                            }
+                        });
+
+//                onShareClicked();
             }
         });
     }
@@ -179,25 +239,6 @@ public class MultiplayerActivity extends AppCompatActivity {
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
-    }
-
-
-    public static Uri generateContentLink() {
-        DynamicLink dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
-                .setLink(Uri.parse("https://play.google.com/store"))
-                .setDomainUriPrefix("https://adarshenterprises.page.link")
-                // Open links with this app on Android
-                .setAndroidParameters(new DynamicLink.AndroidParameters.Builder().setMinimumVersion(1).build())
-                // Open links with com.example.ios on iOS
-                .setIosParameters(new DynamicLink.IosParameters.Builder("com.example.ios").build())
-                .setSocialMetaTagParameters(new DynamicLink.SocialMetaTagParameters.Builder()
-                        .setTitle("Example of a Dynamic Link")
-                        .setDescription("This link works whether the app is installed or not!")
-                        .setImageUrl(Uri.parse("https://res.cloudinary.com/dj2xpmtn5/image/upload/v1614188994/gt1eyo6l4qfmk3twzipq.jpg"))
-                        .build())
-                .buildDynamicLink();
-
-        return dynamicLink.getUri();
     }
 
     private void onShareClicked() {
