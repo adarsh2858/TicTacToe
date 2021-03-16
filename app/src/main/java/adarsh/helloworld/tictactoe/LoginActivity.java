@@ -3,7 +3,6 @@ package adarsh.helloworld.tictactoe;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
@@ -22,8 +21,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -35,7 +32,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 
@@ -47,16 +43,14 @@ public class LoginActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 491;
     private static final String USERS = "users";
     private static final String TAG = "RegisterActivity";
-
+    // Access a Cloud Firestore instance from your Activity
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FirebaseAuth mAuth;
     private FirebaseDatabase database;
     private DatabaseReference mDatabase;
     private EditText mFullName, mEmail, mPassword, mPhone, mLoginEmail, mLoginPassword;
     private Button mRegisterButton, mLoginButton;
     private User newUser;
-
-    // Access a Cloud Firestore instance from your Activity
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -235,20 +229,20 @@ public class LoginActivity extends AppCompatActivity {
                             newUser.put("phoneNumber", phoneNumber);
 
                             // Add a new document with a generated ID
-                            db.collection("users")
-                                    .add(newUser)
-                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                        @Override
-                                        public void onSuccess(DocumentReference documentReference) {
-                                            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.w(TAG, "Error adding document", e);
-                                        }
-                                    });
+//                            db.collection("users")
+//                                    .add(newUser)
+//                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//                                        @Override
+//                                        public void onSuccess(DocumentReference documentReference) {
+//                                            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+//                                        }
+//                                    })
+//                                    .addOnFailureListener(new OnFailureListener() {
+//                                        @Override
+//                                        public void onFailure(@NonNull Exception e) {
+//                                            Log.w(TAG, "Error adding document", e);
+//                                        }
+//                                    });
 
                             // Add a new document with the email as the ID
                             db.collection("users")
