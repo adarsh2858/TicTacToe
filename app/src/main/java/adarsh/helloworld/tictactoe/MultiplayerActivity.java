@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -71,8 +72,6 @@ public class MultiplayerActivity extends AppCompatActivity {
     }
 
     private void showPopup() {
-        //                for (int i = 0; i < usersList.size(); i++)
-        System.out.println(usersList);
         // inflate the layout of the popup window
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = inflater.inflate(R.layout.popup_window, null);
@@ -82,18 +81,32 @@ public class MultiplayerActivity extends AppCompatActivity {
         int height = LinearLayout.LayoutParams.WRAP_CONTENT;
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, true);
 
+        //        myButton.setText("Push Me");
+        LinearLayout ll = (LinearLayout) popupView.findViewById(R.id.btn_layout);
+        System.out.println(ll);
+//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        for (int i = 0; i < usersList.size(); i++) {
+            Button userButton = new Button(getApplicationContext());
+            userButton.setText(Html.fromHtml("<b><big>" + usersList.get(i).getFullName() + "</big></b>" + "<br />" +
+                    "<small>" + usersList.get(i).getEmail() + "</small>" + "<br />"));
+            ll.addView(userButton);
+        }
+
+        Button cancelButton = new Button(getApplicationContext());
+        cancelButton.setText(R.string.cancel);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+            }
+        });
+
+        ll.addView(cancelButton);
+
         // show the popup window
         // which view you pass in it doesn't matter, it is only used for the window token
         popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
-
-        // dismiss the popup window when touched
-        popupView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                popupWindow.dismiss();
-                return true;
-            }
-        });
     }
 
     @Override
@@ -147,7 +160,7 @@ public class MultiplayerActivity extends AppCompatActivity {
         inviteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Invite Logic goes here", Toast.LENGTH_SHORT).show();
+                usersList.clear();
 
                 // Create an explicit intent for an Activity in your app, Create an Intent for the activity you want to start
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -203,7 +216,6 @@ public class MultiplayerActivity extends AppCompatActivity {
                                             // search  for value
                                             Object value = documentData.get(name);
                                             if (name.equals("email")) {
-                                                System.out.println("Key = " + name + ", Value = " + value);
                                                 newUser.setEmail(value.toString());
                                             } else if (name.equals("fullName"))
                                                 newUser.setFullName(value.toString());
