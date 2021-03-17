@@ -71,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
         mLoginEmail = findViewById(R.id.login_email);
         mLoginPassword = findViewById(R.id.login_password);
         mLoginButton = findViewById(R.id.btn_login);
-        spinner = findViewById(R.id.loginProgressBar);
+        spinner = (ProgressBar)findViewById(R.id.loginProgressBar);
 
         mRegisterButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,7 +109,7 @@ public class LoginActivity extends AppCompatActivity {
                 } else if (TextUtils.isEmpty(password)) {
                     mLoginPassword.setError("Password is required.");
                 } else {
-                spinner.setVisibility(View.VISIBLE);
+                    spinner.setVisibility(View.VISIBLE);
                     signIn(email, password);
                 }
             }
@@ -128,11 +128,12 @@ public class LoginActivity extends AppCompatActivity {
 // the GoogleSignInAccount will be non-null.
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
 
-        findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.google_sign_in_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                spinner.setVisibility(View.VISIBLE);
                 switch (v.getId()) {
-                    case R.id.sign_in_button:
+                    case R.id.google_sign_in_button:
                         signIn(mGoogleSignInClient);
                         break;
                 }
@@ -167,6 +168,7 @@ public class LoginActivity extends AppCompatActivity {
                 // ...
             }
         }
+        spinner.setVisibility(View.GONE);
     }
 
     private void firebaseAuthWithGoogle(String idToken) {
@@ -186,6 +188,7 @@ public class LoginActivity extends AppCompatActivity {
                             updateUI(null, null);
                         }
 
+                        spinner.setVisibility(View.GONE);
                         // ...
                     }
                 });
@@ -294,6 +297,10 @@ public class LoginActivity extends AppCompatActivity {
                             Toast.makeText(LoginActivity.this, "Login Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
                         spinner.setVisibility(View.GONE);
+                        
+                        // Empty the login text fields for the email and password
+                        mLoginEmail.setText("");
+                        mLoginPassword.setText("");
                     }
                 });
     }
