@@ -9,6 +9,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -51,6 +52,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mFullName, mEmail, mPassword, mPhone, mLoginEmail, mLoginPassword;
     private Button mRegisterButton, mLoginButton;
     private User newUser;
+    private ProgressBar spinner;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,6 +71,7 @@ public class LoginActivity extends AppCompatActivity {
         mLoginEmail = findViewById(R.id.login_email);
         mLoginPassword = findViewById(R.id.login_password);
         mLoginButton = findViewById(R.id.btn_login);
+        spinner = findViewById(R.id.loginProgressBar);
 
         mRegisterButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,6 +109,7 @@ public class LoginActivity extends AppCompatActivity {
                 } else if (TextUtils.isEmpty(password)) {
                     mLoginPassword.setError("Password is required.");
                 } else {
+                spinner.setVisibility(View.VISIBLE);
                     signIn(email, password);
                 }
             }
@@ -289,6 +293,7 @@ public class LoginActivity extends AppCompatActivity {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(LoginActivity.this, "Login Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
+                        spinner.setVisibility(View.GONE);
                     }
                 });
     }

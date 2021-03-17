@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +53,7 @@ public class MultiplayerActivity extends AppCompatActivity {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FirebaseAuth mAuth;
     private User currentUser;
+    private ProgressBar spinner;
 
     public static Uri generateContentLink() {
         DynamicLink dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
@@ -82,15 +84,13 @@ public class MultiplayerActivity extends AppCompatActivity {
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, true);
 
         //        myButton.setText("Push Me");
-        LinearLayout ll = (LinearLayout) popupView.findViewById(R.id.btn_layout);
-        System.out.println(ll);
-//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout linearLayout = (LinearLayout) popupView.findViewById(R.id.btn_layout);
 
         for (int i = 0; i < usersList.size(); i++) {
             Button userButton = new Button(getApplicationContext());
             userButton.setText(Html.fromHtml("<b><big>" + usersList.get(i).getFullName() + "</big></b>" + "<br />" +
                     "<small>" + usersList.get(i).getEmail() + "</small>" + "<br />"));
-            ll.addView(userButton);
+            linearLayout.addView(userButton);
         }
 
         Button cancelButton = new Button(getApplicationContext());
@@ -102,11 +102,12 @@ public class MultiplayerActivity extends AppCompatActivity {
             }
         });
 
-        ll.addView(cancelButton);
+        linearLayout.addView(cancelButton);
 
         // show the popup window
         // which view you pass in it doesn't matter, it is only used for the window token
         popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
+        spinner.setVisibility(View.GONE);
     }
 
     @Override
@@ -118,6 +119,7 @@ public class MultiplayerActivity extends AppCompatActivity {
         userName = findViewById(R.id.user_name);
         inviteButton = findViewById(R.id.btn_invite);
         mAuth = FirebaseAuth.getInstance();
+        spinner = (ProgressBar)findViewById(R.id.progressBar);
 
         if (mAuth.getCurrentUser() != null) {
             // Retrieving the value using its keys the file name
@@ -160,6 +162,7 @@ public class MultiplayerActivity extends AppCompatActivity {
         inviteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                spinner.setVisibility(View.VISIBLE);
                 usersList.clear();
 
                 // Create an explicit intent for an Activity in your app, Create an Intent for the activity you want to start
