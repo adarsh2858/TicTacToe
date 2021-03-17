@@ -13,4 +13,5 @@
     <string name="enter_fullname">Enter Full Name</string>
     <string name="enter_phone_no">Enter Phone Number</string>
     <string name="sign_in_message">Already a User. Sign In Below.</string>
+    <string name="cancel">Cancel</string>
 </resources>

@@ -3,13 +3,13 @@ package adarsh.helloworld.tictactoe;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,8 +22,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -35,7 +33,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 
@@ -47,16 +44,15 @@ public class LoginActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 491;
     private static final String USERS = "users";
     private static final String TAG = "RegisterActivity";
-
+    // Access a Cloud Firestore instance from your Activity
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FirebaseAuth mAuth;
     private FirebaseDatabase database;
     private DatabaseReference mDatabase;
     private EditText mFullName, mEmail, mPassword, mPhone, mLoginEmail, mLoginPassword;
     private Button mRegisterButton, mLoginButton;
     private User newUser;
-
-    // Access a Cloud Firestore instance from your Activity
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private ProgressBar spinner;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,6 +71,7 @@ public class LoginActivity extends AppCompatActivity {
         mLoginEmail = findViewById(R.id.login_email);
         mLoginPassword = findViewById(R.id.login_password);
         mLoginButton = findViewById(R.id.btn_login);
+        spinner = (ProgressBar)findViewById(R.id.loginProgressBar);
 
         mRegisterButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,19 +83,15 @@ public class LoginActivity extends AppCompatActivity {
 
                 if (TextUtils.isEmpty(fullName)) {
                     mFullName.setError("Full Name is required.");
-                }
-                else if(TextUtils.isEmpty(email)) {
+                } else if (TextUtils.isEmpty(email)) {
                     mEmail.setError("Email is required.");
-                }
-                else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     mEmail.setError("Enter valid email address.");
-                }
-                else if(TextUtils.isEmpty(password)) {
+                } else if (TextUtils.isEmpty(password)) {
                     mPassword.setError("Password is required.");
-                }
-                else {
-                newUser = new User(email, fullName, phoneNo, password);
-                createAccount(email, fullName, phoneNo, password);
+                } else {
+                    newUser = new User(email, fullName, phoneNo, password);
+                    createAccount(email, fullName, phoneNo, password);
                 }
             }
         });
@@ -109,16 +102,14 @@ public class LoginActivity extends AppCompatActivity {
                 String email = mLoginEmail.getText().toString();
                 String password = mLoginPassword.getText().toString();
 
-                if(TextUtils.isEmpty(email)) {
+                if (TextUtils.isEmpty(email)) {
                     mLoginEmail.setError("Email is required.");
-                }
-                else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                     mLoginEmail.setError("Enter valid email address.");
-                }
-                else if(TextUtils.isEmpty(password)) {
+                } else if (TextUtils.isEmpty(password)) {
                     mLoginPassword.setError("Password is required.");
-                }
-                else {
+                } else {
+                    spinner.setVisibility(View.VISIBLE);
                     signIn(email, password);
                 }
             }
@@ -137,11 +128,12 @@ public class LoginActivity extends AppCompatActivity {
 // the GoogleSignInAccount will be non-null.
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
 
-        findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.google_sign_in_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                spinner.setVisibility(View.VISIBLE);
                 switch (v.getId()) {
-                    case R.id.sign_in_button:
+                    case R.id.google_sign_in_button:
                         signIn(mGoogleSignInClient);
                         break;
                 }
@@ -176,6 +168,7 @@ public class LoginActivity extends AppCompatActivity {
                 // ...
             }
         }
+        spinner.setVisibility(View.GONE);
     }
 
     private void firebaseAuthWithGoogle(String idToken) {
@@ -195,6 +188,7 @@ public class LoginActivity extends AppCompatActivity {
                             updateUI(null, null);
                         }
 
+                        spinner.setVisibility(View.GONE);
                         // ...
                     }
                 });
@@ -242,20 +236,25 @@ public class LoginActivity extends AppCompatActivity {
                             newUser.put("phoneNumber", phoneNumber);
 
                             // Add a new document with a generated ID
+//                            db.collection("users")
+//                                    .add(newUser)
+//                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+//                                        @Override
+//                                        public void onSuccess(DocumentReference documentReference) {
+//                                            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+//                                        }
+//                                    })
+//                                    .addOnFailureListener(new OnFailureListener() {
+//                                        @Override
+//                                        public void onFailure(@NonNull Exception e) {
+//                                            Log.w(TAG, "Error adding document", e);
+//                                        }
+//                                    });
+
+                            // Add a new document with the email as the ID
                             db.collection("users")
-                                    .add(newUser)
-                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                        @Override
-                                        public void onSuccess(DocumentReference documentReference) {
-                                            Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.w(TAG, "Error adding document", e);
-                                        }
-                                    });
+                                    .document(email)
+                                    .set(newUser);
 
                             updateUI(user, email);
                         } else {
@@ -297,6 +296,11 @@ public class LoginActivity extends AppCompatActivity {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(LoginActivity.this, "Login Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
+                        spinner.setVisibility(View.GONE);
+                        
+                        // Empty the login text fields for the email and password
+                        mLoginEmail.setText("");
+                        mLoginPassword.setText("");
                     }
                 });
     }
