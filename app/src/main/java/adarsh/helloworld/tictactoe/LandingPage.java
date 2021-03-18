@@ -20,7 +20,7 @@ import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 public class LandingPage extends AppCompatActivity {
 
     private static final String TAG = "Landing Page Activity";
-    Button DoublePlayerButton, MultiplayerButton;
+    Button SinglePlayerButton, DoublePlayerButton, MultiplayerButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +29,16 @@ public class LandingPage extends AppCompatActivity {
 
         handleDynamicLinks();
 
+        SinglePlayerButton = findViewById(R.id.btn_1_player);
         DoublePlayerButton = findViewById(R.id.btn_2_player);
         MultiplayerButton = findViewById(R.id.btn_multiplayer);
+
+        SinglePlayerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), SinglePlayerActivity.class));
+            }
+        });
 
         DoublePlayerButton.setOnClickListener(new View.OnClickListener() {
             @Override
