@@ -3,9 +3,7 @@ package adarsh.helloworld.tictactoe;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-public class SinglePlayerActivity extends AppCompatActivity {
+public class SinglePlayerActivity extends TicTacToeBoard {
 
     TextView mScoreBoard;
 
@@ -15,5 +13,6 @@ public class SinglePlayerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_single_player);
 
         mScoreBoard = findViewById(R.id.score_board);
+        setOnClickListeners();
     }
 }
