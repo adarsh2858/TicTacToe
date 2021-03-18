@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -41,101 +40,12 @@
             android:id="@+id/btn_login"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/login"
-            android:layout_toRightOf="@id/btn_reset"
             android:layout_marginTop="30dp"
+            android:layout_toRightOf="@id/btn_reset"
             android:onClick="login"
-            />
+            android:text="@string/login" />
     </RelativeLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <Button
-            android:id="@+id/btn_00"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:freezesText="true"
-            style="@android:style/TextAppearance.DeviceDefault.Large" />
-
-        <Button
-            android:id="@+id/btn_01"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:freezesText="true"
-            style="@android:style/TextAppearance.DeviceDefault.Large" />
-
-        <Button
-            android:id="@+id/btn_02"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:freezesText="true"
-            style="@android:style/TextAppearance.DeviceDefault.Large" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <Button
-            android:id="@+id/btn_10"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:freezesText="true"
-            style="@android:style/TextAppearance.DeviceDefault.Large" />
-
-        <Button
-            android:id="@+id/btn_11"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:freezesText="true"
-            style="@android:style/TextAppearance.DeviceDefault.Large" />
-
-        <Button
-            android:id="@+id/btn_12"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:freezesText="true"
-            style="@android:style/TextAppearance.DeviceDefault.Large" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <Button
-            android:id="@+id/btn_20"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:freezesText="true"
-            style="@android:style/TextAppearance.DeviceDefault.Large" />
-
-        <Button
-            android:id="@+id/btn_21"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:freezesText="true"
-            style="@android:style/TextAppearance.DeviceDefault.Large" />
-
-        <Button
-            android:id="@+id/btn_22"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:freezesText="true"
-            style="@android:style/TextAppearance.DeviceDefault.Large" />
-    </LinearLayout>
+    <include layout="@layout/tic_tac_toe_board" />
 
 </LinearLayout>
