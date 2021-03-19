@@ -11,13 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".SinglePlayerActivity"></activity>
-        <activity android:name=".LandingPage">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".LandingPage" />
         <activity
             android:name=".MainActivity"
             android:parentActivityName=".LandingPage" />
@@ -36,6 +30,14 @@
                 <data
                     android:host="example.com"
                     android:scheme="https" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".SplashScreen"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
