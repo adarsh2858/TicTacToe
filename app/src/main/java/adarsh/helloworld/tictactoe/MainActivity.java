@@ -13,22 +13,12 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-
-    private Button[][] buttons = new Button[3][3];
-
-    private final String player1 = "X";
-    private final String player2 = "O";
+public class MainActivity extends TicTacToeBoard implements View.OnClickListener {
 
     private TextView textViewPlayer1;
     private TextView textViewPlayer2;
 
-    private int player1Points = 0;
     private int player2Points = 0;
-
-    private boolean player1Turn = true;
-
-    private int roundCount = 0;
 
     private Button resetButton, loginButton;
 
@@ -48,15 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (mAuth.getCurrentUser() != null)
             loginButton.setText(R.string.sign_out);
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                String btn = "btn_" + i + j;
-                // How to use getResource() and similar approach to fetch the button
-                int resID = getResources().getIdentifier(btn, "id", getPackageName());
-                buttons[i][j] = findViewById(resID);
-                buttons[i][j].setOnClickListener(this);
-            }
-        }
+        setOnClickListeners();
 
         resetButton = findViewById(R.id.btn_reset);
         resetButton.setOnClickListener(new View.OnClickListener() {
@@ -67,75 +49,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    public boolean checkForWin() {
-        String[][] fields = new String[3][3];
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                fields[i][j] = buttons[i][j].getText().toString();
-            }
-        }
-        for (int i = 0; i < 3; i++) {
-            if (!fields[i][0].equals("")
-                    && fields[i][0].equals(fields[i][2])
-                    && fields[i][0].equals(fields[i][1]))
-                return true;
-        }
-        for (int i = 0; i < 3; i++) {
-            if (!fields[0][i].equals("")
-                    && fields[0][i].equals(fields[2][i])
-                    && fields[0][i].equals(fields[1][i]))
-                return true;
-        }
-
-        if (!fields[0][0].equals("")
-                && fields[0][0].equals(fields[1][1])
-                && fields[0][0].equals(fields[2][2]))
-            return true;
-        if (!fields[0][2].equals("")
-                && fields[0][2].equals(fields[1][1])
-                && fields[0][2].equals(fields[2][0]))
-            return true;
-        return false;
-    }
-
-    public void player1Wins() {
-        player1Points++;
-        Toast.makeText(this, "Player 1 Wins", Toast.LENGTH_SHORT).show();
-    }
-
     public void player2Wins() {
         player2Points++;
         Toast.makeText(this, "Player 2 Wins", Toast.LENGTH_SHORT).show();
     }
 
-    public void draw() {
-        Toast.makeText(this, "It's a Draw", Toast.LENGTH_SHORT).show();
-    }
-
     @Override
     public void onClick(View v) {
-        if(!((Button) v).getText().toString().equals(""))
-            return;
-
-        roundCount++;
-
-        if (player1Turn)
-            ((Button) v).setText(player1);
-        else
-            ((Button) v).setText(player2);
-
-        if (checkForWin()) {
-            if (player1Turn)
-                player1Wins();
-            else
-                player2Wins();
-            resetBoard();
-        } else if (roundCount == 9) {
-            draw();
-            resetBoard();
-        } else {
-            player1Turn = !player1Turn;
-        }
+        super.onClick(v);
     }
 
     public void updatePointsTextViews() {
@@ -145,13 +66,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void resetBoard() {
         updatePointsTextViews();
-        roundCount = 0;
-        player1Turn = true;
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                buttons[i][j].setText("");
-            }
-        }
+        super.resetBoard();
     }
 
     public void resetGame() {

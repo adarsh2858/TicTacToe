@@ -15,4 +15,9 @@ public class SinglePlayerActivity extends TicTacToeBoard {
         mScoreBoard = findViewById(R.id.score_board);
         setOnClickListeners();
     }
+
+    public void resetBoard() {
+        super.resetBoard();
+        mScoreBoard.setText(R.string.current_score);
+    }
 }
