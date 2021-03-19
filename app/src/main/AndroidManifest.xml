@@ -10,7 +10,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SinglePlayerActivity"></activity>
+        <activity
+            android:name=".SinglePlayerActivity"
+            android:parentActivityName=".LandingPage"></activity>
         <activity android:name=".LandingPage" />
         <activity
             android:name=".MainActivity"
