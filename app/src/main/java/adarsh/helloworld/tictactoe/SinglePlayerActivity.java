@@ -16,8 +16,17 @@ public class SinglePlayerActivity extends TicTacToeBoard {
         setOnClickListeners();
     }
 
+    public void updatePointsTextViews() {
+        mScoreBoard.setText(getString(R.string.current_score, player1Points));
+    }
+
     public void resetBoard() {
+        updatePointsTextViews();
         super.resetBoard();
-        mScoreBoard.setText(R.string.current_score);
+    }
+
+    public void resetGame() {
+        player1Points = 0;
+        updatePointsTextViews();
     }
 }
