@@ -227,7 +227,8 @@ public class MultiplayerActivity extends AppCompatActivity {
                                         usersList.add(newUser);
 //                                        System.out.println(usersList);
                                     }
-                                    showPopup();
+                                    startActivity(new Intent(getApplicationContext(), PopupActivity.class));
+//                                    showPopup();
 
                                 } else {
                                     Log.w(TAG, "Error getting documents.", task.getException());

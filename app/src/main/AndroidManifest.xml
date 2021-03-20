@@ -35,6 +35,9 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".PopupActivity"
+            android:parentActivityName=".MultiplayerActivity" />
+        <activity
             android:name=".SplashScreen"
             android:theme="@style/SplashTheme">
             <intent-filter>
